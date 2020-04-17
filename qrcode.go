@@ -59,8 +59,8 @@ import (
 	"log"
 	"os"
 
-	bitset "github.com/skip2/go-qrcode/bitset"
-	reedsolomon "github.com/skip2/go-qrcode/reedsolomon"
+	"github.com/skip2/go-qrcode/bitset"
+	"github.com/skip2/go-qrcode/reedsolomon"
 )
 
 // Encode a QR Code and return a raw PNG image.
@@ -106,7 +106,7 @@ func WriteFile(content string, level RecoveryLevel, size int, filename string) e
 // a larger image is silently written. Negative values for size cause a variable
 // sized image to be written: See the documentation for Image().
 func WriteColorFile(content string, level RecoveryLevel, size int, background,
-	foreground color.Color, filename string) error {
+foreground color.Color, filename string) error {
 
 	var q *QRCode
 
@@ -269,12 +269,16 @@ func (q *QRCode) Bitmap() [][]bool {
 // returned is the minimum size required for the QR Code. Choose a larger
 // negative number to increase the scale of the image. e.g. a size of -5 causes
 // each module (QR Code "pixel") to be 5px in size.
-func (q *QRCode) Image(size int) image.Image {
-	// Build QR code.
-	q.encode()
 
+func (q *QRCode) Image(size int) image.Image {
 	// Minimum pixels (both width and height) required.
 	realSize := q.symbol.size
+	return q.ImageWithReal(size, realSize)
+}
+
+func (q *QRCode) ImageWithReal(size int, realSize int) image.Image {
+	// Build QR code.
+	q.encode()
 
 	// Variable size support.
 	if size < 0 {
